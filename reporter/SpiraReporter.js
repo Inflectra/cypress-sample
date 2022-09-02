@@ -16,6 +16,7 @@ function SpiraReporter(runner, options) {
   var startDate = new Date();
   var stackTrace = '';
   var testName = '-';
+  var specFile = null;
   var steps = [];
   this._options = {};
 
@@ -31,7 +32,7 @@ function SpiraReporter(runner, options) {
 
   runner.on('start', function () {
     //Log to the console that we're running using this reporter
-    console.log(color('suite', 'Starting Test Run using SpiraTest Reporter'));
+    console.log(color('suite', 'Starting Test Run using SpiraTest Reporter'));    
   });
 
   runner.on('pass', function(test){
@@ -44,6 +45,10 @@ function SpiraReporter(runner, options) {
     stackTrace +=  mocha.reporters.Base.symbols.ok + ' pass: ' + test.fullTitle() + '\n';
     steps.push({ ActualResult: 'Pass', ExecutionStatusId: 2 /* Pass */, Description: test.title });
     testName = test.parent.title;
+    if (test.parent.parent && test.parent.parent.file && !specFile)
+    {
+      specFile = test.parent.parent.file;
+    }
   });
 
   runner.on('fail', function(test, err){
@@ -55,6 +60,10 @@ function SpiraReporter(runner, options) {
     stackTrace +=  mocha.reporters.Base.symbols.err + ' fail: ' + test.fullTitle() + '\n';
     steps.push({ ActualResult: err.message, ExecutionStatusId: 1 /* Fail */, Description: test.title });
     testName = test.parent.title;
+    if (test.parent.parent && test.parent.parent.file && !specFile)
+    {
+      specFile = test.parent.parent.file;
+    }
   });
 
   runner.on('end', function(){
@@ -86,7 +95,8 @@ function SpiraReporter(runner, options) {
       }
     
       var context = {
-        self: self
+        self: self,
+        specFile: specFile
       };
       spiraClient.recordTestRun(projectId, testCaseId, releaseId, testSetId, startDate, endDate, executionStatusId, testName, assertCount, message, stackTrace, steps, self._onRecordSuccess, self._onRecordFailure, context);
     }
@@ -99,10 +109,15 @@ function SpiraReporter(runner, options) {
 
 SpiraReporter.prototype._onRecordSuccess = function(testRunId, context) {
   var self = context.self;
+  var specFilePath = context.specFile;
+  //var specFilePath = cypress\e2e\1-getting-started\todo2.cy.js;
+
   //Now we can try and upload any screenshots to SpiraTest
+  var specFileName = path.basename(specFilePath);
+  //var directoryPath ='cypress/screenshots/todo2.cy.js';
+  var directoryPath = path.join('cypress', 'screenshots', specFileName);
 
   //Make sure the folder exists
-  var directoryPath ='/Git/cypress-sample/cypress/screenshots/todo2.cy.js';
   if (fs.existsSync(directoryPath)) {
     //Get all the files
     fs.readdir(directoryPath, function (err, files) {
