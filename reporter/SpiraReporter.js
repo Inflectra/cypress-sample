@@ -1,4 +1,6 @@
 var mocha = require('mocha');
+const fs = require('fs');
+var path = require("path");
 var SpiraClient = require('./SpiraClient.js');
 
 module.exports = SpiraReporter;
@@ -98,14 +100,27 @@ function SpiraReporter(runner, options) {
 SpiraReporter.prototype._onRecordSuccess = function(testRunId, context) {
   var self = context.self;
   //Now we can try and upload any screenshots and/or video files to SpiraTest
-  var spiraClient = new SpiraClient(self._options.protocol, self._options.host, self._options.port, self._options.vdir, self._options.login, self._options.apiKey);
-  var projectId = 1;
-  var filename = 'test.png';
-  var binaryData = 'VGVzdDEyMw==';
-  var artifactTypeId = 5 /*Test Run*/;
-  var artifactId = testRunId;
-  console.log('mum');
-  spiraClient.documentUpload(projectId, filename, binaryData, artifactTypeId, artifactId, self._onUploadSuccess, self._onUploadFailure);
+
+  //First see if we have a video file
+  var pathName ='/Git/cypress-sample/cypress/screenshots/todo2.cy.js/example to-do app -- displays two todo items by default (failed).png';
+  if (fs.existsSync(pathName)) {
+    //open the file
+    fs.readFile(pathName, {encoding: 'base64'}, function(err, data){
+      
+      //Upload the file to spira
+      var spiraClient = new SpiraClient(self._options.protocol, self._options.host, self._options.port, self._options.vdir, self._options.login, self._options.apiKey);
+      var projectId = 1;
+      var filename = path.basename(pathName);;
+      var binaryData = data; //'VGVzdDEyMw==';
+      var artifactTypeId = 5 /*Test Run*/;
+      var artifactId = testRunId;
+      spiraClient.documentUpload(projectId, filename, binaryData, artifactTypeId, artifactId, self._onUploadSuccess, self._onUploadFailure);
+    });
+  }
+  else
+  {
+    console.log('Unable to find video file at location: ' + pathName);
+  }
 };
 SpiraReporter.prototype._onRecordFailure = function() {
 };
