@@ -1,0 +1,1 @@
+npx cypress run --browser edge --spec "cypress\e2e\1-getting-started\todo.cy.js" --reporter "reporter\SpiraReporter"

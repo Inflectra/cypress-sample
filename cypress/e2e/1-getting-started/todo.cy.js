@@ -1,3 +1,6 @@
+//set the SpiraTest test case
+//global.spiraOptions.testCaseId = 4;
+
 /// <reference types="cypress" />
 
 // Welcome to Cypress!

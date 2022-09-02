@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Inflectra/cypress-sample#readme",
   "devDependencies": {
-    "cypress": "^10.7.0"
+    "cypress": "^10.7.0",
+    "mocha": "^10.0.0"
   }
 }
