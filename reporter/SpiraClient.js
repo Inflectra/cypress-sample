@@ -27,7 +27,7 @@ function SpiraClient(protocol, host, port, vdir, login, apiKey) {
     console.log('Created SpiraTest API Client.');
 }
 
-SpiraClient.prototype.recordTestRun = function(projectId, testCaseId, releaseId, testSetId, startDate, endDate, executionStatusId, testName, assertCount, message, stackTrace, steps, success_callback, failure_callback) {
+SpiraClient.prototype.recordTestRun = function(projectId, testCaseId, releaseId, testSetId, startDate, endDate, executionStatusId, testName, assertCount, message, stackTrace, steps, success_callback, failure_callback, context) {
     var path;
     if (this._vdir && this._vdir != '') {
         path = '/' + this._vdir + this._SPIRA_URL_SUFFIX + 'projects/{project_id}/test-runs/record';
@@ -79,24 +79,112 @@ SpiraClient.prototype.recordTestRun = function(projectId, testCaseId, releaseId,
     }
 
     const req = protocolRequest(options, (res) => {
+        var body = '';
         //console.log(`STATUS: ${res.statusCode}`);
         //console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
         res.setEncoding('utf8');
         res.on('data', (chunk) => {
-            //console.log(`BODY: ${chunk}`);
+            if (res.statusCode == 200) {
+                body += chunk;
+            }
+            else {
+                console.log(`BODY: ${chunk}`);
+            }
+        });
+        res.on('end', () => {
+            if (res.statusCode == 200) {
+                if (success_callback) {
+                    //console.log(body);
+                    var testRunId = JSON.parse(body).TestRunId;
+                    console.log('Successfully sent test results to SpiraTest as Test Run TR:' + testRunId);
+                    success_callback(testRunId, context);
+                }
+            }
+            else {
+                console.log('There was an error sending the test results to SpiraTest - ' + res.statusMessage + ' (' + res.statusCode + ')');
+                if (failure_callback) {
+                    failure_callback(res);
+                }                    
+            }
+        });
+    });
+    
+    req.on('error', (e) => {
+        console.error(`problem with request: ${e.message}`);
+        if (failure_callback) {
+            failure_callback(e);
+        }
+    });
+    
+    // write data to request body
+    req.write(postData);
+    req.end();
+    //console.log('Request Sent'); 
+};
+
+SpiraClient.prototype.documentUpload = function(projectId, filename, binaryData, artifactTypeId, artifactId, success_callback, failure_callback) {
+    //projects/{project_id}/documents/file
+    var path;
+    if (this._vdir && this._vdir != '') {
+        path = '/' + this._vdir + this._SPIRA_URL_SUFFIX + 'projects/{project_id}/documents/file';
+    }
+    else {
+        path = this._SPIRA_URL_SUFFIX + 'projects/{project_id}/documents/file';        
+    }
+    path = path.replace('{project_id}', projectId);
+
+    var remoteDocumentFile = {
+        FilenameOrUrl: filename,
+        BinaryData: binaryData,
+        AttachedArtifacts: [{
+            ArtifactTypeId: artifactTypeId,
+            ArtifactId: artifactId
+        }]
+    };
+
+    //Make the REST Call to send the data to Spira
+    const postData = JSON.stringify(remoteDocumentFile);
+    //console.log('POST DATA: ' + postData);  
+
+    const options = {
+        hostname: this._host,
+        port: this._port,
+        path: path,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData),
+            'username': this._login,
+            'api-key': this._apiKey
+        }
+    };
+
+    console.log('Uploading file ' + filename + ' to SpiraTest: ' + this._protocol + '://' + options.hostname + ':' + options.port + options.path);
+    
+    //Handle HTTP or HTTPS
+    var protocolRequest = http.request;
+    if (this._protocol == 'https') {
+        protocolRequest = https.request;
+    }
+
+    const req = protocolRequest(options, (res) => {
+        //console.log(`STATUS: ${res.statusCode}`);
+        //console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
             if (res.statusCode != 200) {
                 console.log(`BODY: ${chunk}`);
             }
         });
         res.on('end', () => {
             if (res.statusCode == 200) {
-                console.log('Successfully sent test results to SpiraTest.');
+                console.log('Successfully uploaded file to SpiraTest.');
                 if (success_callback) {
                     success_callback();
                 }
             }
             else {
-                console.log('There was an error sending the test results to SpiraTest - ' + res.statusMessage + ' (' + res.statusCode + ')');
+                console.log('There was an error uploaded file to SpiraTest - ' + res.statusMessage + ' (' + res.statusCode + ')');
                 if (failure_callback) {
                     failure_callback(res);
                 }                    

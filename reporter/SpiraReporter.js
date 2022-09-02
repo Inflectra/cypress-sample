@@ -83,7 +83,10 @@ function SpiraReporter(runner, options) {
         executionStatusId = (failures > 0) ? /* Failed */ 1 : /* Passed */ 2;      
       }
     
-      spiraClient.recordTestRun(projectId, testCaseId, releaseId, testSetId, startDate, endDate, executionStatusId, testName, assertCount, message, stackTrace, steps, self._onRecordSuccess, self._onRecordFailure);
+      var context = {
+        self: self
+      };
+      spiraClient.recordTestRun(projectId, testCaseId, releaseId, testSetId, startDate, endDate, executionStatusId, testName, assertCount, message, stackTrace, steps, self._onRecordSuccess, self._onRecordFailure, context);
     }
     else
     {
@@ -92,7 +95,21 @@ function SpiraReporter(runner, options) {
   });
 }
 
-SpiraReporter.prototype._onRecordSuccess = function() {
+SpiraReporter.prototype._onRecordSuccess = function(testRunId, context) {
+  var self = context.self;
+  //Now we can try and upload any screenshots and/or video files to SpiraTest
+  var spiraClient = new SpiraClient(self._options.protocol, self._options.host, self._options.port, self._options.vdir, self._options.login, self._options.apiKey);
+  var projectId = 1;
+  var filename = 'test.png';
+  var binaryData = 'VGVzdDEyMw==';
+  var artifactTypeId = 5 /*Test Run*/;
+  var artifactId = testRunId;
+  console.log('mum');
+  spiraClient.documentUpload(projectId, filename, binaryData, artifactTypeId, artifactId, self._onUploadSuccess, self._onUploadFailure);
 };
 SpiraReporter.prototype._onRecordFailure = function() {
+};
+SpiraReporter.prototype._onUploadSuccess = function() {
+};
+SpiraReporter.prototype._onUploadFailure = function() {
 };
