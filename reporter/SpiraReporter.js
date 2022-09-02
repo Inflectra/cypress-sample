@@ -89,8 +89,6 @@ function SpiraReporter(runner, options) {
     {
       console.log(color('fail', 'No SpiraTest test case ID specified for this test, so it won\'t be reported back to SpiraTest'));
     }
-    //Return exit code
-    process.exit(failures);
   });
 }
 

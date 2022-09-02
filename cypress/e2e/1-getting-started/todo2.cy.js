@@ -10,6 +10,7 @@
 // what makes it such an awesome testing tool,
 // please read our getting started guide:
 // https://on.cypress.io/introduction-to-cypress
+// This one deliberately has a failure in it
 
 describe('example to-do app', () => {
   beforeEach(() => {
@@ -30,7 +31,8 @@ describe('example to-do app', () => {
     // the correct text. We use the `first` and `last` functions
     // to get just the first and last matched elements individually,
     // and then perform an assertion with `should`.
-    cy.get('.todo-list li').first().should('have.text', 'Pay electric bill')
+    // We have added the 'xxxx' to force a failure
+    cy.get('.todo-list li').first().should('have.text', 'Pay electric bill XXXX')
     cy.get('.todo-list li').last().should('have.text', 'Walk the dog')
   })
 
@@ -79,7 +81,7 @@ describe('example to-do app', () => {
       .should('have.class', 'completed')
   })
 
-  context('with a checked task', () => {
+  context('with a checked task 2', () => {
     beforeEach(() => {
       // We'll take the command we used above to check off an element
       // Since we want to perform multiple tests that start with checking

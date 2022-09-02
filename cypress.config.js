@@ -22,7 +22,8 @@ module.exports = defineConfig({
     host: '127.0.0.1',
     vdir: 'Spira',
     mapping: {
-      "with a checked task": 4
+      "with a checked task": 4,
+      "with a checked task 2": 5
     }
   }
 });
