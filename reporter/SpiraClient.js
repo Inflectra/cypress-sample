@@ -23,7 +23,7 @@ function SpiraClient(protocol, host, port, vdir, login, apiKey) {
     }
 
     this._SPIRA_PLUG_IN_NAME = 'Cypress';
-    this._SPIRA_URL_SUFFIX = '/Services/v5_0/RestService.svc/';
+    this._SPIRA_URL_SUFFIX = '/Services/v6_0/RestService.svc/';
     console.log('Created SpiraTest API Client.');
 }
 
@@ -37,16 +37,12 @@ SpiraClient.prototype.recordTestRun = function(projectId, testCaseId, releaseId,
     }
     path = path.replace('{project_id}', projectId);
 
-    //Convert the dates to WCF format
-    const startDateWcf = this._createWcfDate(startDate);
-    const endDateWcf = this._createWcfDate(endDate);
-    
     var remoteTestRun = {
         TestCaseId: testCaseId,
         ReleaseId: releaseId,
         TestSetId: testSetId,
-        StartDate: startDateWcf,
-        EndDate: endDateWcf,
+        StartDate: new Date(startDate),
+        EndDate:new Date(endDate),
         ExecutionStatusId: executionStatusId,
         RunnerName: this._SPIRA_PLUG_IN_NAME,
         RunnerTestName: testName,
@@ -119,14 +115,4 @@ SpiraClient.prototype.recordTestRun = function(projectId, testCaseId, releaseId,
     req.write(postData);
     req.end();
     //console.log('Request Sent'); 
-};
-
-//Creates a WCF JSON date in format /Date(1245398693390)/ from a JS date object - no time zone required
-SpiraClient.prototype._createWcfDate = function (/**Date*/dateObj)
-{
-    if (dateObj) {
-        var dateInMsSince1970 = dateObj.getTime();
-        return "/Date(" + dateInMsSince1970 + ")/";
-    }
-    return null;
 };
