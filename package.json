@@ -1,0 +1,22 @@
+{
+  "name": "cypress-sample",
+  "version": "1.0.0",
+  "description": "Cypress Sample Project for SpiraTest Integration",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Inflectra/cypress-sample.git"
+  },
+  "author": "Inflectra Corporation",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Inflectra/cypress-sample/issues"
+  },
+  "homepage": "https://github.com/Inflectra/cypress-sample#readme",
+  "devDependencies": {
+    "cypress": "^10.7.0"
+  }
+}
