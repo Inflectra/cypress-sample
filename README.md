@@ -4,7 +4,7 @@ This is a sample cypress project that uploads Cypress test results automatically
 It is implemented as a custom reporter that you can easily add to your existing Cypress projects and have the benefit of the test results and screenshots automatically upload against the corresponding Spira test case.
 
 ## Installing the Cypress Reporter
-To install the Spira custom reporter, simply download the [Spira-Cypress-Reporter.zip](Spira-Cypress-Reporter.zip) zip file and extract the contents (consisting of the `reporter` folder) and place in your Cypress project at the same level as the `cypress` folder. For example:
+To install the Spira custom reporter, simply download the [Spira-Cypress-Reporter.zip](https://github.com/Inflectra/cypress-sample/raw/main/Spira-Cypress-Reporter.zip) zip file and extract the contents (consisting of the `reporter` folder) and place in your Cypress project at the same level as the `cypress` folder. For example:
 
 ![Sample file view of a Cypress project](images/spira-reporter-1.png)
 
