@@ -23,7 +23,8 @@ module.exports = defineConfig({
     vdir: 'Spira',
     mapping: {
       "with a checked task": 4,
-      "with a checked task 2": 5
+      "with a checked task 2": 5,
+      "with a checked task 3": 6
     }
   }
 });
