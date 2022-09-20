@@ -137,7 +137,7 @@ SpiraReporter.prototype._onRecordSuccess = function(testRunId, context) {
           }
           //Upload the file to spira
           var spiraClient = new SpiraClient(self._options.protocol, self._options.host, self._options.port, self._options.vdir, self._options.login, self._options.apiKey);
-          var projectId = 1;
+          var projectId = self._options.projectId;
           var binaryData = data; //'VGVzdDEyMw==';
           var artifactTypeId = 5 /*Test Run*/;
           var artifactId = testRunId;
